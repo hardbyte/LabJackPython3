@@ -17,7 +17,7 @@ from time import sleep
 from datetime import datetime
 import struct
 import threading
-import Queue
+import queue
 import ctypes, copy, sys
 
 # MAX_REQUESTS is the number of packets to be read.
@@ -54,13 +54,13 @@ d = None
 #d.streamConfig( NumChannels = 1, ChannelNumbers = [ 0 ], ChannelOptions = [ 0 ], SettlingFactor = 1, ResolutionIndex = 1, SampleFrequency = 50000 )
 
 if d is None:
-    print "Configure a device first.\nPlease open streamTest-threading.py in a text editor and uncomment the lines for your device, starting at about line 16.\n\nExiting..."
+    print("Configure a device first.\nPlease open streamTest-threading.py in a text editor and uncomment the lines for your device, starting at about line 16.\n\nExiting...")
     sys.exit(0)
     
 class StreamDataReader(object):
     def __init__(self, device):
         self.device = device
-        self.data = Queue.Queue()
+        self.data = queue.Queue()
         self.dataCount = 0
         self.missed = 0
         self.running = False
@@ -73,7 +73,7 @@ class StreamDataReader(object):
         while self.running:
             # Calling with convert = False, because we are going to convert in
             # the main thread.
-            returnDict = self.device.streamData(convert = False).next()
+            returnDict = next(self.device.streamData(convert = False))
             
             self.data.put_nowait(copy.deepcopy(returnDict))
             
@@ -81,20 +81,20 @@ class StreamDataReader(object):
             if self.dataCount > MAX_REQUESTS:
                 self.running = False
         
-        print "stream stopped."
+        print("stream stopped.")
         self.device.streamStop()
         stop = datetime.now()
         
         total = self.dataCount * self.device.packetsPerRequest * self.device.streamSamplesPerPacket
-        print "%s requests with %s packets per request with %s samples per packet = %s samples total." % ( self.dataCount, d.packetsPerRequest, d.streamSamplesPerPacket, total )
+        print("%s requests with %s packets per request with %s samples per packet = %s samples total." % ( self.dataCount, d.packetsPerRequest, d.streamSamplesPerPacket, total ))
         
-        print "%s samples were lost due to errors." % self.missed
+        print("%s samples were lost due to errors." % self.missed)
         total -= self.missed
-        print "Adjusted number of samples = %s" % total
+        print("Adjusted number of samples = %s" % total)
         
         runTime = (stop-start).seconds + float((stop-start).microseconds)/1000000
-        print "The experiment took %s seconds." % runTime
-        print "%s samples / %s seconds = %s Hz" % ( total, runTime, float(total)/runTime )
+        print("The experiment took %s seconds." % runTime)
+        print("%s samples / %s seconds = %s Hz" % ( total, runTime, float(total)/runTime ))
 
 sdr = StreamDataReader(d)
 
@@ -118,22 +118,22 @@ while True:
         if result['errors'] != 0:
             errors += result['errors']
             missed += result['missed']
-            print "+++++ Total Errors: %s, Total Missed: %s" % (errors, missed)
+            print("+++++ Total Errors: %s, Total Missed: %s" % (errors, missed))
             
         # Convert the raw bytes (result['result']) to voltage data.
         r = d.processStreamData(result['result'])
         
         # Do some processing on the data to show off.
-        print "Average of", len(r['AIN0']), "reading(s):", sum(r['AIN0'])/len(r['AIN0'])
+        print("Average of", len(r['AIN0']), "reading(s):", sum(r['AIN0'])/len(r['AIN0']))
 
-    except Queue.Empty:
-        print "Queue is empty. Stopping..."
+    except queue.Empty:
+        print("Queue is empty. Stopping...")
         sdr.running = False
         break
     except KeyboardInterrupt:
         sdr.running = False
-    except Exception, e:
-        print type(e), e
+    except Exception as e:
+        print(type(e), e)
         sdr.running = False
         break
     

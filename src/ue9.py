@@ -11,7 +11,7 @@ http://labjack.com/support/ue9/users-guide/5.2
 """
 from LabJackPython import *
 
-import struct, socket, select, ConfigParser
+import struct, socket, select, configparser
 
 def openAllUE9():
     """
@@ -255,7 +255,7 @@ class UE9(Device):
                     listen = True
         s.close()
         
-        for ip, data in ue9s.items():
+        for ip, data in list(ue9s.items()):
             data = list(struct.unpack("B"*38, data))
             ue9 = { 'LocalID' : data[8], 'PowerLevel' : data[9] , 'IPAddress' : parseIpAddress(data[10:14]), 'Gateway' : parseIpAddress(data[14:18]), 'Subnet' : parseIpAddress(data[18:23]), 'PortA' : struct.unpack("<H", struct.pack("BB", *data[22:24]))[0], 'PortB' : struct.unpack("<H", struct.pack("BB", *data[24:26]))[0], 'DHCPEnabled' : bool(data[26]), 'ProductID' : data[27], 'MACAddress' : "%02X:%02X:%02X:%02X:%02X:%02X" % (data[33], data[32], data[31], data[30], data[29], data[28]), 'SerialNumber' : struct.unpack("<I", struct.pack("BBBB", data[28], data[29], data[30], 0x10))[0], 'HWVersion' : "%s.%02d" % (data[35], data[34]), 'CommFWVersion' : "%s.%02d" % (data[37], data[36])}
             ue9s[ip] = ue9
@@ -859,7 +859,7 @@ class UE9(Device):
         Desc: Sends and receives serial data using SPI synchronous
               communication.
         """
-        print SPIBytes
+        print(SPIBytes)
         if not isinstance(SPIBytes, list):
             raise LabJackException("SPIBytes MUST be a list of bytes")
         
@@ -1322,7 +1322,7 @@ class UE9(Device):
               object. Useful for saving the setup of your UE9.
         """
         # Make a new configuration file
-        parser = ConfigParser.SafeConfigParser()
+        parser = configparser.SafeConfigParser()
         
         # Change optionxform so that options preserve their case.
         parser.optionxform = str

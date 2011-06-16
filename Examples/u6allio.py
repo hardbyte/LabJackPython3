@@ -49,11 +49,11 @@ try:
 
     end = datetime.now()
     delta = end - start
-    print "Time difference: ", delta
+    print("Time difference: ", delta)
     dm = delta / numIterations
-    print "Time per iteration: ", dm
-    print "Time per iteration in millis: ", dm.microseconds  / 1000.0
-    print "Latest readings: ", latestAinValues
+    print("Time per iteration: ", dm)
+    print("Time per iteration in millis: ", dm.microseconds  / 1000.0)
+    print("Latest readings: ", latestAinValues)
 
 finally:
     d.close()

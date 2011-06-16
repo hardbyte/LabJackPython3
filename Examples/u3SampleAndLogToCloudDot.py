@@ -36,19 +36,19 @@ import signal
 from datetime import datetime
 
 from httplib2 import Http
-from urllib import urlencode
+from urllib.parse import urlencode
 
 def sampleAndPost(*args):
-    print "----- Gathering sample at", datetime.now()
+    print("----- Gathering sample at", datetime.now())
     reading = d.readRegister(MODBUS_REGISTER)
-    print "===== Read", reading
+    print("===== Read", reading)
     data = dict(value = reading)
     # Here is the call that posts to CloudDot
     resp, content = h.request(writeUrl, "POST", urlencode(data))
-    print "+++++ Post to CloudDot at", datetime.now(), "Response status:", resp["status"]
+    print("+++++ Post to CloudDot at", datetime.now(), "Response status:", resp["status"])
     if resp["status"].startswith('2') == False:
         raise Exception("Post failed; check your CloudDot username, API key, and channel. Response status was: %s" % (resp["status"],))
-    print
+    print()
 
 d = u3.U3()
 writeUrl = "http://cloudapi.labjack.com/%s/channels/%s/write.json" % (CLOUDDOT_USERNAME, CLOUDDOT_CHANNEL)

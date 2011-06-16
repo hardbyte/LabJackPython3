@@ -16,7 +16,7 @@ ranges = [20, 2, 0.2, 0.02]
 strRanges = ["+/- 10", "+/- 1", "+/- 0.1", "+/- 0.01"]
 
 # Numerical versions of range that the LabJack expects
-vRanges = range(4)
+vRanges = list(range(4))
 
 def calcNoiseAndResolution(d, resolutionIndex, voltageRange):
     """
@@ -31,12 +31,12 @@ def calcNoiseAndResolution(d, resolutionIndex, voltageRange):
     start = datetime.now()
     
     # Collect 128 samples
-    for i in xrange(128):
+    for i in range(128):
         readings.append(d.getFeedback(cmd)[0]['AIN'])
     
     finish = datetime.now()
     
-    print "%s per sample" % ( (finish-start) / 128)
+    print("%s per sample" % ( (finish-start) / 128))
     
     # The Peak-To-Peak Noise is difference between the max and the min.
     p2pn = max(readings) - min(readings)
@@ -68,12 +68,12 @@ d = u6.U6()
 
 # If you have a U6-Pro, this will run though all the Resolution Indexs
 if d.deviceName.endswith("Pro"):
-    rIndexes = range(1, 13)
+    rIndexes = list(range(1, 13))
 else:
-    rIndexes = range(1, 9)
+    rIndexes = list(range(1, 9))
 
 for i in rIndexes:
     for r in vRanges:
         rs = calcNoiseAndResolution(d,i,r)
-        print "Resolution Index = %s, Range = %s:\n\tPeak-To-Peak Noise = %s, Noise-Free Resolution (bits) = %.1f, Noise-Free Resolution (uV) = %.1f\n\tRMS Noise = %i, Effective Resolution (bits) = %.1f, Effective Resolution (uV) = %.1f\n" % (i, strRanges[r], rs[0], rs[1], rs[2], rs[3], rs[4], rs[5] )
+        print("Resolution Index = %s, Range = %s:\n\tPeak-To-Peak Noise = %s, Noise-Free Resolution (bits) = %.1f, Noise-Free Resolution (uV) = %.1f\n\tRMS Noise = %i, Effective Resolution (bits) = %.1f, Effective Resolution (uV) = %.1f\n" % (i, strRanges[r], rs[0], rs[1], rs[2], rs[3], rs[4], rs[5] ))
 

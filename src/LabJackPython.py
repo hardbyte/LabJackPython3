@@ -7,7 +7,7 @@ This python wrapper is intended to make working with your LabJack device easy. T
 A typical user should start with their device's module, such as u3.py.
 """
 # We use the 'with' keyword to manage the thread-safe device lock. It's built-in on 2.6; 2.5 requires an import.
-from __future__ import with_statement
+
 
 import collections
 import ctypes
@@ -108,28 +108,28 @@ def _loadLibrary():
     if(os.name == 'posix'):
         try:
             return _loadLinuxSo()
-        except OSError, e:
+        except OSError as e:
             pass # We may be on Mac.
-        except Exception, e:
+        except Exception as e:
             raise LabJackException("Could not load the Linux SO for some reason other than it not being installed. Ethernet connectivity only.\n\n    The error was: %s" % e)
         
         try:
             return _loadMacDylib()
-        except OSError, e:
+        except OSError as e:
             raise LabJackException("Could not load the Exodriver driver. Ethernet connectivity only.\n\nCheck that the Exodriver is installed, and the permissions are set correctly.\nThe error message was: %s" % e)
-        except Exception, e:
+        except Exception as e:
             raise LabJackException("Could not load the Mac Dylib for some reason other than it not being installed. Ethernet connectivity only.\n\n    The error was: %s" % e)
                     
     if(os.name == 'nt'):
         try:
             return ctypes.windll.LoadLibrary("labjackud")
-        except Exception, e:
+        except Exception as e:
             raise LabJackException("Could not load labjackud driver. Ethernet connectivity availability only.\n\n    The error was: %s" % e)
 
 try:
     staticLib = _loadLibrary()
-except LabJackException, e:
-    print "%s: %s" % ( type(e), e )
+except LabJackException as e:
+    print("%s: %s" % ( type(e), e ))
     staticLib = None
     
 # Attempt to load the windows Skymote library.
@@ -260,7 +260,7 @@ class Device(object):
             elif os.name == 'nt':
                 wb = self._writeToUDDriver(writeBuffer, modbus)
         
-        if self.debug: print "Sent: ", hexWithoutQuotes(wb)
+        if self.debug: print("Sent: ", hexWithoutQuotes(wb))
     
     def read(self, numBytes, stream = False, modbus = False):
         """read(numBytes, stream = False, modbus = False)
@@ -503,12 +503,12 @@ class Device(object):
             self.write(request, modbus = True, checksum = False)
             try:
                 result = self.read(numBytes, modbus = True)
-                if self.debug: print "Response: ", hexWithoutQuotes(result)
+                if self.debug: print("Response: ", hexWithoutQuotes(result))
                 return result
             except LabJackException:
                 self.write(request, modbus = True, checksum = False)
                 result = self.read(numBytes, modbus = True)
-                if self.debug: print "Response: ", hexWithoutQuotes(result)
+                if self.debug: print("Response: ", hexWithoutQuotes(result))
                 return result
     
     def _checkCommandBytes(self, results, commandBytes):
@@ -534,7 +534,7 @@ class Device(object):
             self.write(command, checksum = checksum)
             
             result = self.read(readLen, stream=False)
-            if self.debug: print "Response: ", hexWithoutQuotes(result)
+            if self.debug: print("Response: ", hexWithoutQuotes(result))
             if checkBytes:
                 self._checkCommandBytes(result, commandBytes)
                         
@@ -561,8 +561,8 @@ class Device(object):
                 return True
 
             return False
-        except Exception, e:
-            print e
+        except Exception as e:
+            print(e)
             return False
         
 
@@ -609,7 +609,7 @@ class Device(object):
                     
 
     def _loadChangedIntoSelf(self, d):
-        for key, value in d.changed.items():
+        for key, value in list(d.changed.items()):
             self.__setattr__(key, value)
             
     def _registerAtExitClose(self):
@@ -677,7 +677,7 @@ class Device(object):
                 rcvDataBuff = self.read(4)
                 if(len(rcvDataBuff) != 4):
                     raise LabJackException(0, "Unable to reset labJack 2")
-            except Exception, e:
+            except Exception as e:
                 raise LabJackException(0, "Unable to reset labjack: %s" % str(e))
 
     def breakupPackets(self, packets, numBytesPerPacket):
@@ -789,7 +789,7 @@ class Device(object):
                 e = ord(result[11+(i*numBytes)])
                 if e != 0:
                     errors += 1
-                    if self.debug and e != 60 and e != 59: print e
+                    if self.debug and e != 60 and e != 59: print(e)
                     if e == 60:
                         missed += struct.unpack('<I', result[6+(i*numBytes):10+(i*numBytes)] )[0]
             
@@ -836,7 +836,7 @@ class Device(object):
         if name[1] == 3:
             # Old style string
             name = "My %s" % self.deviceName
-            if self.debug: print "Old UTF-16 name detected, replacing with %s" % name
+            if self.debug: print("Old UTF-16 name detected, replacing with %s" % name)
             self.setName(name)
             name = name.decode("UTF-8")
         else:
@@ -845,7 +845,7 @@ class Device(object):
                 name = struct.pack("B"*end, *name[:end]).decode("UTF-8")
             except ValueError:
                 name = "My %s" % self.deviceName
-                if self.debug: print "Invalid name detected, replacing with %s" % name 
+                if self.debug: print("Invalid name detected, replacing with %s" % name) 
                 self.setName(name)
                 name = name.decode("UTF-8")
         
@@ -920,7 +920,7 @@ class Device(object):
     def setToFactoryDefaults(self):
         return self.setDefaults(SetToFactoryDefaults = True)
     
-    validDefaultBlocks = range(8)
+    validDefaultBlocks = list(range(8))
     def readDefaults(self, BlockNum, ReadCurrent = False):
         """
         Name: Device.readDefaults(BlockNum)
@@ -1000,9 +1000,9 @@ def setChecksum(command):
         else:
             command = setChecksum8(command, len(command))
             return command
-    except LabJackException, e:
+    except LabJackException as e:
         raise e
-    except Exception, e:
+    except Exception as e:
         raise LabJackException("SetChecksum Exception:" + str(e))
 
 
@@ -1143,7 +1143,7 @@ def listAll(deviceType, connectionType = 1):
         
         deviceList = dict()
     
-        for i in xrange(pNumFound.value):
+        for i in range(pNumFound.value):
             if pSerialNumbers[i] != 1010:
                 deviceValue = dict(localId = pIDs[i], serialNumber = pSerialNumbers[i], ipAddress = DoubleToStringAddress(pAddresses[i]), devType = deviceType)
                 deviceList[pSerialNumbers[i]] = deviceValue
@@ -1223,8 +1223,8 @@ def openAllLabJacks():
         devs[0x501] = listAll(0x501)
         
         devices = list()
-        for prodId, numConnected in devs.items():
-            for i, serial in enumerate(numConnected.keys()):
+        for prodId, numConnected in list(devs.items()):
+            for i, serial in enumerate(list(numConnected.keys())):
                 d = Device(None, devType = prodId)
                 if prodId == 0x501:
                     d.open(prodId, devNumber = i)
@@ -1264,7 +1264,7 @@ def _openLabJackUsingLJSocket(deviceType, firstFound, pAddress, LJSocket, handle
 def _openLabJackUsingUDDriver(deviceType, connectionType, firstFound, pAddress, devNumber ):
     if devNumber is not None:
         devs = listAll(deviceType)
-        pAddress = devs.keys()[(devNumber-1)]
+        pAddress = list(devs.keys())[(devNumber-1)]
     
     handle = ctypes.c_long()
     pAddress = str(pAddress)
@@ -1289,7 +1289,7 @@ def _openLabJackUsingExodriver(deviceType, firstFound, pAddress, devNumber):
     elif(firstFound):
         handle = openDev(1, 0, devType)
         if handle <= 0:
-            print "handle: %s" % handle 
+            print("handle: %s" % handle) 
             raise NullHandleException()
         return handle
     else:      
@@ -1375,7 +1375,7 @@ def _openUE9OverEthernet(firstFound, pAddress, devNumber):
             else:
                 # Got a bad checksum.
                 pass
-    except LabJackException, e:
+    except LabJackException as e:
         raise LabJackException(LJE_LABJACK_NOT_FOUND, "%s" % e)
     except:
         raise LabJackException("LJE_LABJACK_NOT_FOUND: Couldn't find the specified LabJack.")
@@ -1492,7 +1492,7 @@ def _makeDeviceFromHandle(handle, deviceType):
             device.changed['commFWVersion'] = device.commFWVersion
             
             
-        except Exception, e:
+        except Exception as e:
             device.close()
             raise e  
         
@@ -1506,7 +1506,7 @@ def _makeDeviceFromHandle(handle, deviceType):
         try:
             device.write(sndDataBuff, checksum = False)
             rcvDataBuff = device.read(38) 
-        except LabJackException, e:
+        except LabJackException as e:
             device.close()
             raise e
         
@@ -1541,7 +1541,7 @@ def _makeDeviceFromHandle(handle, deviceType):
         try:
             device.write(command)
             rcvDataBuff = device.read(38)
-        except LabJackException, e:
+        except LabJackException as e:
             device.close()
             raise e
         
@@ -2639,7 +2639,7 @@ def LJHash(hashStr, size):
     @return: The hashed string.
     """  
     
-    print "Hash String:" + str(hashStr)
+    print("Hash String:" + str(hashStr))
     
     outBuff = (ctypes.c_char * 16)()
     retBuff = ''
@@ -2672,7 +2672,7 @@ def __listAllUE9Unix(connectionType):
     if connectionType == LJ_ctUSB:
         numDevices = staticLib.LJUSB_GetDevCount(LJ_dtUE9)
     
-        for i in xrange(numDevices):
+        for i in range(numDevices):
             try:
                 device = openLabJack(LJ_dtUE9, 1, firstFound = False, devNumber = i+1)
                 device.close()
@@ -2726,7 +2726,7 @@ def __listAllUE9Unix(connectionType):
 
                         deviceList[serial] = dict(devType = LJ_dtUE9, localId = localId, \
                                                     serialNumber = serial, ipAddress = ipAddress)
-                except Exception, e:
+                except Exception as e:
                     pass
         except:
             pass
@@ -2741,7 +2741,7 @@ def __listAllU3Unix():
     deviceList = {}
     numDevices = staticLib.LJUSB_GetDevCount(LJ_dtU3)
 
-    for i in xrange(numDevices):
+    for i in range(numDevices):
         try:
             device = openLabJack(LJ_dtU3, 1, firstFound = False, devNumber = i+1)
             device.close()
@@ -2759,7 +2759,7 @@ def __listAllU6Unix():
     deviceList = {}
     numDevices = staticLib.LJUSB_GetDevCount(LJ_dtU6)
 
-    for i in xrange(numDevices):
+    for i in range(numDevices):
         try:
             device = openLabJack(LJ_dtU6, 1, firstFound = False, devNumber = i+1)
             device.close()
@@ -2775,7 +2775,7 @@ def __listAllBridgesUnix():
     deviceList = {}
     numDevices = staticLib.LJUSB_GetDevCount(0x501)
 
-    for i in xrange(numDevices):
+    for i in range(numDevices):
         try:
             device = openLabJack(0x501, 1, firstFound = False, devNumber = i+1)
             device.close()
@@ -2879,7 +2879,7 @@ class LJSocketHandle(object):
             else:
                 raise Exception("Got an error from LJSocket. It said '%s'" % l)
             
-        except Exception, e:
+        except Exception as e:
             raise LabJackException(ec = LJE_LABJACK_NOT_FOUND, errorString = "Couldn't connect to a LabJack at %s:%s. The error was: %s" % (ipAddress, port, str(e)))
     
     def close(self):
@@ -2931,12 +2931,12 @@ class UE9TCPHandle(object):
                 self.modbus = socket.socket()
                 self.modbus.connect((ipAddress, 502))
                 self.modbus.settimeout(timeout)
-            except socket.error, e:
+            except socket.error as e:
                 raise LabJackException("Couldn't connect to the Modbus port on the UE9. Please upgrade to UE9 Comm firmware to 1.43 or higher.")
-        except LabJackException, e:
+        except LabJackException as e:
             raise e
-        except Exception, e:
-            print e
+        except Exception as e:
+            print(e)
             raise LabJackException("Couldn't open sockets to the UE9 at IP Address %s. Error was: %s" % (ipAddress, e))
         
 
@@ -2945,8 +2945,8 @@ class UE9TCPHandle(object):
             self.data.close()
             self.stream.close()
             self.modbus.close()
-        except Exception, e:
-            print "UE9 Handle close exception: ", e
+        except Exception as e:
+            print("UE9 Handle close exception: ", e)
             pass
 
 

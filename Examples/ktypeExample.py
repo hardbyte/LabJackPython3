@@ -175,10 +175,10 @@ if __name__ == '__main__':
         # Important: Must be in millivolts
         TCmVolts = d.getAIN(0, resolutionIndex = 8, gainIndex = 3) * 1000
         
-        print "Cold Junction Temp:", CJTEMPinC
-        print "Voltage (in milivolts):", TCmVolts
+        print("Cold Junction Temp:", CJTEMPinC)
+        print("Voltage (in milivolts):", TCmVolts)
         
         totalMVolts = TCmVolts + tempCToMVolts(CJTEMPinC)
         
-        print "Temperature:", mVoltsToTempC(totalMVolts)
+        print("Temperature:", mVoltsToTempC(totalMVolts))
         sleep(1)

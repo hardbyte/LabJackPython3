@@ -29,7 +29,7 @@ def calcNoiseAndResolution(d, positiveChannel = 0, negitiveChannel = 31):
     
     cmd = u3.AIN(positiveChannel, negitiveChannel, QuickSample = False, LongSettling = False)
     
-    for i in xrange(128):
+    for i in range(128):
         readings.append( float(d.getFeedback(cmd)[0])/16 )
     #print readings
     
@@ -55,15 +55,15 @@ def calcNoiseAndResolution(d, positiveChannel = 0, negitiveChannel = 31):
     
     return p2pn, nfrbits, nfrres
     
-print DESC
+print(DESC)
 
-pos = raw_input("Positive Channel (0-31) [0]: ")
+pos = input("Positive Channel (0-31) [0]: ")
 try:
     pos = int(pos)
 except:
     pos = 0
 
-neg = raw_input("Negitive Channel (0-31) [31]: ")
+neg = input("Negitive Channel (0-31) [31]: ")
 try:
     neg = int(neg)
 except:
@@ -73,8 +73,8 @@ d = u3.U3()
 
 results = calcNoiseAndResolution(d, pos, neg)
 
-print "Peak-To-Peak Noise =", results[0]
-print "Noise Free Resolution (bits) =", results[1]
-print "Noise Free Resolution (mV) =", results[2]
+print("Peak-To-Peak Noise =", results[0])
+print("Noise Free Resolution (bits) =", results[1])
+print("Noise Free Resolution (mV) =", results[2])
 
 d.close()

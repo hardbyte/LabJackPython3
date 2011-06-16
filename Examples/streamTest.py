@@ -37,7 +37,7 @@ MAX_REQUESTS = 75
     
 try:
     start = datetime.now()
-    print "start stream", start
+    print("start stream", start)
     d.streamStart()
     
     missed = 0
@@ -53,17 +53,17 @@ try:
                 break
             
             if r['errors'] != 0:
-                print "Error: %s ; " % r['errors'], datetime.now()
+                print("Error: %s ; " % r['errors'], datetime.now())
 
             if r['numPackets'] != d.packetsPerRequest:
-                print "----- UNDERFLOW : %s : " % r['numPackets'], datetime.now()
+                print("----- UNDERFLOW : %s : " % r['numPackets'], datetime.now())
 
             if r['missed'] != 0:
                 missed += r['missed']
-                print "+++ Missed ", r['missed']
+                print("+++ Missed ", r['missed'])
 
             # Comment out this print and do something with r
-            print "Average of", len(r['AIN0']), "reading(s):", sum(r['AIN0'])/len(r['AIN0'])
+            print("Average of", len(r['AIN0']), "reading(s):", sum(r['AIN0'])/len(r['AIN0']))
 
             dataCount += 1
 
@@ -72,22 +72,22 @@ try:
             # Got no data back from our read.
             # This only happens if your stream isn't faster than the 
             # the USB read timeout, ~1 sec.
-            print "No data", datetime.now()
+            print("No data", datetime.now())
     
 finally:
-    print "stream stopped."
+    print("stream stopped.")
     stop = datetime.now()
     d.streamStop()
     d.close()
 
     total = dataCount * d.packetsPerRequest * d.streamSamplesPerPacket
-    print "%s requests with %s packets per request with %s samples per packet = %s samples total." % ( dataCount, d.packetsPerRequest, d.streamSamplesPerPacket, total )
-    print "%s samples were lost due to errors." % missed
+    print("%s requests with %s packets per request with %s samples per packet = %s samples total." % ( dataCount, d.packetsPerRequest, d.streamSamplesPerPacket, total ))
+    print("%s samples were lost due to errors." % missed)
     total -= missed
-    print "Adjusted number of samples = %s" % total
+    print("Adjusted number of samples = %s" % total)
     
     runTime = (stop-start).seconds + float((stop-start).microseconds)/1000000
-    print "The experiment took %s seconds." % runTime
-    print "%s samples / %s seconds = %s Hz" % ( total, runTime, float(total)/runTime )
+    print("The experiment took %s seconds." % runTime)
+    print("%s samples / %s seconds = %s Hz" % ( total, runTime, float(total)/runTime ))
     
     

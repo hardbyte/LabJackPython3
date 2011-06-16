@@ -37,11 +37,11 @@ d.writeRegister(7100, [0, baseValue])
 for i in range(65):
     currentValue = baseValue - (i * 1000)
     dutyCycle = ( float(65536 - currentValue) / 65535 ) * 100
-    print "Duty Cycle = %s%%" % dutyCycle
+    print("Duty Cycle = %s%%" % dutyCycle)
     #d.getFeedback( u6.Timer0( Value = currentValue, UpdateReset = True ) )
     d.writeRegister(7200, currentValue)
     sleep(0.3)
-print "Duty Cycle = 100%"
+print("Duty Cycle = 100%")
 #d.getFeedback( u6.Timer0( Value = 0, UpdateReset = True ) )
 d.writeRegister(7200, 0)
 

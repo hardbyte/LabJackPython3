@@ -11,7 +11,7 @@ http://labjack.com/support/u6/users-guide/5.2
 """
 from LabJackPython import *
 
-import struct, ConfigParser
+import struct, configparser
 
 
 def openAllU6():
@@ -236,9 +236,9 @@ class U6(Device):
         #command[9-25] = Reserved 
         try:
             result = self._writeRead(command, 38, [0xF8, 0x10, 0x08])
-        except LabJackException, e:
+        except LabJackException as e:
             if e.errorCode is 4:
-                print "NOTE: ConfigU6 returned an error of 4. This probably means you are using U6 with a *really old* firmware. Please upgrade your U6's firmware as soon as possible."
+                print("NOTE: ConfigU6 returned an error of 4. This probably means you are using U6 with a *really old* firmware. Please upgrade your U6's firmware as soon as possible.")
                 result = self._writeRead(command, 38, [0xF8, 0x10, 0x08], checkBytes = False)
             else:
                 raise e
@@ -420,7 +420,7 @@ class U6(Device):
         
             if rcvBuffer[3] != 0x00:
                 raise LabJackException("Got incorrect command bytes")
-        except LowlevelErrorException, e:
+        except LowlevelErrorException as e:
             if isinstance(commandlist[0], list):
                 culprit = commandlist[0][ (rcvBuffer[7] -1) ]
             else:
@@ -1039,7 +1039,7 @@ class U6(Device):
         <ainDiffOffset: -2.46886488446,...>
         """
         if self.debug is True:
-            print "Calibration data retrieval"
+            print("Calibration data retrieval")
         
         self.calInfo.nominal = False
         
@@ -1322,7 +1322,7 @@ class U6(Device):
         Desc: Takes a configuration and puts it into a ConfigParser object.
         """
         # Make a new configuration file
-        parser = ConfigParser.SafeConfigParser()
+        parser = configparser.SafeConfigParser()
         
         # Change optionxform so that options preserve their case.
         parser.optionxform = str
@@ -1340,10 +1340,10 @@ class U6(Device):
         
         dirs, states = self.getFeedback( PortDirRead(), PortStateRead() )
         
-        for key, value in dirs.items():
+        for key, value in list(dirs.items()):
             parser.set(section, "%s Directions" % key, str(value))
             
-        for key, value in states.items():
+        for key, value in list(states.items()):
             parser.set(section, "%s States" % key, str(value))
             
         # DACs
@@ -1365,7 +1365,7 @@ class U6(Device):
         parser.add_section(section)
         
         timerclockconfig = self.configTimerClock()
-        for key, value in timerclockconfig.items():
+        for key, value in list(timerclockconfig.items()):
             parser.set(section, key, str(value))
         
         # Timers / Counters
@@ -1373,7 +1373,7 @@ class U6(Device):
         parser.add_section(section)
         
         ioconfig = self.configIO()
-        for key, value in ioconfig.items():
+        for key, value in list(ioconfig.items()):
             parser.set(section, key, str(value))
             
         
@@ -1493,7 +1493,7 @@ class FeedbackCommand(object):
     def handle(self, input):
         return None
 
-validChannels = range(144)
+validChannels = list(range(144))
 class AIN(FeedbackCommand):
     '''
     Analog Input Feedback command
@@ -2132,7 +2132,7 @@ class TimerConfig(FeedbackCommand):
     def __init__(self, timer, TimerMode, Value=0):
         '''Creates command bytes for configureing a Timer'''
         #Conditions come from pages 33-34 of user's guide
-        if timer not in range(4):
+        if timer not in list(range(4)):
             raise LabJackException("Timer should be either 0-3.")
         
         if TimerMode > 14 or TimerMode < 0:
