@@ -385,7 +385,7 @@ class Device(object):
         numReg = Modbus.calcNumberOfRegisters(addr, numReg = numReg)
         
         pkt = Modbus.readHoldingRegistersRequest(addr, numReg = numReg, unitId = unitId)
-        pkt = [ ord(c) for c in pkt ]
+        pkt = [ c for c in pkt ]
         
         numBytes = 9 + (2 * int(numReg))
         
@@ -451,7 +451,7 @@ class Device(object):
             return self._buildWriteFloatToRegister(addr, value, unitId, fmt)
 
         request = Modbus.writeRegisterRequest(addr, value, unitId)
-        request = [ ord(c) for c in request ]
+        request = [ c for c in request ]
         numBytes = 12
         return request, numBytes
 
@@ -466,7 +466,7 @@ class Device(object):
         
         request = Modbus._buildHeaderBytes(length = len(payload)+1, unitId = unitId)
         request += payload
-        request = [ ord(c) for c in request ]
+        request = [ c for c in request ]
         numBytes = 12
 
         return (request, numBytes)
@@ -474,7 +474,7 @@ class Device(object):
         
     def _buildWriteMultipleRegisters(self, startAddr, values, unitId = None):
         request = Modbus.writeRegistersRequest(startAddr, values, unitId)
-        request = [ ord(c) for c in request ]
+        request = [ c for c in request ]
         numBytes = 12
 
         return (request, numBytes)
