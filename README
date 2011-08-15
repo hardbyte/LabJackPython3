@@ -3,8 +3,13 @@ examples for LabJack devices.
 04/21/2011
 support@labjack.com
 
+Windows users with a UD device (u3, u6 or ue9) should install the
+LabJack drivers from:
+
+    http://labjack.com/support/windows-ud
+
 Python 2.5 or higher is required to use LabJackPython. To use the UE9
-over Ethernet, install comm firmware 1.50 or higher. At the moment it’s
+over Ethernet, install comm firmware 1.50 or higher. At the moment it's
 on the beta page:
 
     http://labjack.com/support/firmware/ue9/beta

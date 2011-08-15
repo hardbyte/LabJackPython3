@@ -1,4 +1,4 @@
-import u6, ue9
+from labjack import U6, ue9
 from time import sleep
 
 # Coefficients
@@ -164,7 +164,7 @@ def mVoltsToTempC(mVolts):
 
 
 if __name__ == '__main__':
-    d = u6.U6()
+    d = U6()
     
     for i in range(10):
         # The cold junction temperature

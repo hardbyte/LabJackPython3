@@ -1,6 +1,6 @@
 # Based on u6allio.c
 
-import u6
+from labjack import u6
 from datetime import datetime
 import sys
 
