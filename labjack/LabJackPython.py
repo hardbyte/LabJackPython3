@@ -786,9 +786,9 @@ class Device(object):
 
             errors = 0
             missed = 0
-            firstPacket = ord(result[10])
+            firstPacket = result[10]
             for i in range(numPackets):
-                e = ord(result[11+(i*numBytes)])
+                e = result[11+(i*numBytes)]
                 if e != 0:
                     errors += 1
                     if self.debug and e != 60 and e != 59: print(e)
